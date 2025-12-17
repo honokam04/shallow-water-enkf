@@ -4,6 +4,7 @@ import pandas as pd
 from scipy.interpolate import pchip_interpolate
 
 
+# 1. グラフから抽出した主要な制御点 (Distance, Depth)
 distance_points = np.array([
     0, 60, 62, 65, 70, 80, 85, 95, 100, 103,
     105, 107, 115, 120, 125, 133, 135, 138,

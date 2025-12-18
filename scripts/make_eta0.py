@@ -24,7 +24,7 @@ def create_csv() -> pd.DataFrame:
     # 3. PCHIP補間（形状保持区分的3次エルミート多項式）
     eta0_new = pchip_interpolate(dist_pts, wave_pts, x_new)
 
-    # 4. CSVデータの作成
+    # 4. データフレームの作成
     df = pd.DataFrame({'Distance (km)': x_new,
                        'Wave Height (m)': eta0_new})
     return df
@@ -39,7 +39,6 @@ def main():
         os.mkdir(csv_path)
 
     df = create_csv()
-
     df.to_csv(csv_path + '/wave_height_initial.csv', index=False)
 
 

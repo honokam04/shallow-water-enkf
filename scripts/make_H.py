@@ -24,7 +24,7 @@ def create_csv() -> pd.DataFrame:
     # 3. PCHIP補間（形状保持区分的3次エルミート多項式）
     H_new = pchip_interpolate(distance_points, depth_points, x_new)
 
-    # 4. CSVデータの作成
+    # 4. データフレームの作成
     df = pd.DataFrame({'Distance (km)': x_new, 'Depth (km)': H_new})
     return df
 
@@ -38,7 +38,6 @@ def main():
         os.mkdir(csv_path)
 
     df = create_csv()
-
     df.to_csv(csv_path + '/bathemetry.csv', index=False)
 
 

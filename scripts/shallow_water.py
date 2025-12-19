@@ -4,7 +4,7 @@ import os
 
 
 def run_shallow_water(eta0, H_new, dx=500.0, g=9.81,
-                      total_time=3000.0, CFL=0.5, save_dir="../results"):
+                      total_time=3000.0, CFL=0.8, save_dir="../results"):
 
     # ディレクトリ作成
     if not os.path.exists(save_dir):
@@ -38,10 +38,8 @@ def run_shallow_water(eta0, H_new, dx=500.0, g=9.81,
 
         # (B) 連続の式：水位 η の更新
         H_at_u = 0.5 * (H[1:] + H[:-1])  # uの地点での水深を補間
-        for i in range(1, nx-1):
-            eta[i] = eta[i] - (dt / dx) * (
-                H_at_u[i] * u[i+1] - H_at_u[i-1] * u[i]
-                )
+        for i in range(0, nx-1):
+            eta[i] = eta[i] - (dt / dx) * H[i] * (u[i+1] - u[i])
 
         # 履歴保存
         eta_history[t_step, :] = eta

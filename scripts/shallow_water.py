@@ -29,7 +29,7 @@ def run_shallow_water(eta0, H_new, dx=500.0, g=9.81,
     for t_step in range(nt):
         # (A) 運動方程式：流速 u の更新
         for i in range(1, nx):
-            u[i] = u[i] - (g * dt / dx) * (eta[i] - eta[i-1])
+            u[i] -= (g * dt / dx) * (eta[i] - eta[i-1])
 
         # 境界条件
         u[0] = 0          # q = U*H かつ q(0,t)=0 すなわち u(0,t)=0
@@ -37,9 +37,8 @@ def run_shallow_water(eta0, H_new, dx=500.0, g=9.81,
         eta[-1] = eta[-2]
 
         # (B) 連続の式：水位 η の更新
-        H_at_u = 0.5 * (H[1:] + H[:-1])  # uの地点での水深を補間
         for i in range(0, nx-1):
-            eta[i] = eta[i] - (dt / dx) * H[i] * (u[i+1] - u[i])
+            eta[i] -= (dt / dx) * H[i] * (u[i+1] - u[i])
 
         # 履歴保存
         eta_history[t_step, :] = eta

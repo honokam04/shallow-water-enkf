@@ -25,16 +25,20 @@ def run_shallow_water(eta0, H_new, dx=500.0, g=9.81,
     u = np.zeros(nx + 1)       # スタガード格子での流速
     eta_history = np.zeros((nt, nx))
 
+    c_out = np.sqrt(g * H[-1]) # 外洋側境界における流速
+
     # 数値計算(スタガード格子による Leap-frog 法)
     for t_step in range(nt):
         # (A) 運動方程式：流速 u の更新
         for i in range(1, nx):
             u[i] -= (g * dt / dx) * (eta[i] - eta[i-1])
 
-        # 境界条件
+        # 境界条件(海岸側)
         u[0] = 0          # q = U*H かつ q(0,t)=0 すなわち u(0,t)=0
-        u[-1] = u[-2]     # 非反射条件（1階の外挿）
-        eta[-1] = eta[-2]
+
+        # 非反射条件(対流流出条件)
+        u[-1] = u[-1] - (c_out * dt / dx) * (u[-1] - u[-2])
+        eta[-1] = eta[-1] - (c_out * dt / dx) * (eta[-1] - eta[-2])
 
         # (B) 連続の式：水位 η の更新
         for i in range(0, nx-1):

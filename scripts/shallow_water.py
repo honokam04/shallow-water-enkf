@@ -25,13 +25,12 @@ def run_shallow_water(eta0, H_new, dx=500.0, g=9.81,
     u = np.zeros(nx + 1)       # スタガード格子での流速
     eta_history = np.zeros((nt, nx))
 
-    c_out = np.sqrt(g * H[-1]) # 外洋側境界における流速
+    c_out = np.sqrt(g * H[-1])  # 外洋側境界における流速
 
     # 数値計算(スタガード格子による Leap-frog 法)
     for t_step in range(nt):
         # (A) 運動方程式：流速 u の更新
-        for i in range(1, nx):
-            u[i] -= (g * dt / dx) * (eta[i] - eta[i-1])
+        u[1:nx] = u[1:nx] - (g * dt / dx) * (eta[1:nx] - eta[0:nx-1])
 
         # 境界条件(海岸側)
         u[0] = 0          # q = U*H かつ q(0,t)=0 すなわち u(0,t)=0
@@ -41,8 +40,7 @@ def run_shallow_water(eta0, H_new, dx=500.0, g=9.81,
         eta[-1] = eta[-1] - (c_out * dt / dx) * (eta[-1] - eta[-2])
 
         # (B) 連続の式：水位 η の更新
-        for i in range(0, nx-1):
-            eta[i] -= (dt / dx) * H[i] * (u[i+1] - u[i])
+        eta[0:nx-1] = eta[0:nx-1] - (dt / dx) * H[0:nx-1] * (u[1:nx] - u[0:nx-1])
 
         # 履歴保存
         eta_history[t_step, :] = eta
@@ -64,9 +62,8 @@ def run_shallow_water(eta0, H_new, dx=500.0, g=9.81,
     plt.title('Space-Time Plot of Tsunami ($\\eta$)')
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, "eta_heatmap.png"))
-    plt.show()
 
-    print("Simulation completed. Results saved in folder:", save_dir)
+    return eta, u, eta_history
 
 
 if __name__ == "__main__":

@@ -13,13 +13,14 @@
 pip3 install -r requirements.txt
 ~~~
 
-2. `scripts`上で以下のコマンドを順に入力する.
+2. `scripts/make_data`上で以下のコマンドを順に入力する.
 ~~~
 python3 make_H.py
 ~~~
 ~~~
 python3 make_eta0.py
 ~~~
+3. `scripts/model`上で以下のコマンドを入力する.
 ~~~
-python3 shallow_water.py
+python3 python3 model_heatmap.py
 ~~~

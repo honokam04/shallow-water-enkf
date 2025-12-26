@@ -39,7 +39,7 @@ def create_H_matrix(nx, interval, missing_idx=None):
     return H, np.array(obs_indices), n_state, n_obs
 
 
-# 真の
+# 真のeta、uの履歴
 def true_history(nx, nt, eta0, H, g, dx, CFL):
     eta_true_history = np.zeros((nt, nx))
     u_true_history = np.zeros((nt, nx + 1))

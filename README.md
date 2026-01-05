@@ -22,5 +22,5 @@ python3 make_eta0.py
 ~~~
 3. `scripts/model`上で以下のコマンドを入力する.
 ~~~
-python3 python3 model_heatmap.py
+python3 python3 run_enkf.py
 ~~~

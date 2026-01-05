@@ -8,19 +8,15 @@ from shallow_water import step_forward
 def run_shallow_water(eta0, H_minus, dx=500.0, g=9.81,
                       total_time=3000.0, CFL=0.8, save_dir="../../results"):
 
-    # ディレクトリ作成
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
     # 水深と初期条件の準備
     eta = eta0.copy()
-    H = np.abs(H_minus) * 1000.0  # km -> m
+    H = np.abs(H_minus) * 1000.0  # km -> m, 符号を逆転
     nx = len(H)
     u = np.zeros(nx + 1)
 
-    # --- 1ステップ実行して、正しい dt を取得する ---
-    # ループ前に1回空回しするか、手動で一度計算して nt を確定させる必要があります。
-    # ここでは物理的な安定性を優先し、最初のステップで決まる dt を基準にします。
     _, _, dt = step_forward(eta, u, H, nx, g, dx, CFL)
     nt = int(total_time / dt)
 
@@ -30,10 +26,9 @@ def run_shallow_water(eta0, H_minus, dx=500.0, g=9.81,
     eta_history = np.zeros((nt, nx))
     u_history = np.zeros((nt, nx+1))
 
-    # --- 数値計算ループ ---
+    # 数値計算
     current_time = 0.0
     for t_step in range(nt):
-        # 戻り値の3つ（eta, u, dt）をすべて受け取る
         eta, u, step_dt = step_forward(eta, u, H, nx, g, dx, CFL)
 
         # 履歴保存
@@ -47,7 +42,7 @@ def run_shallow_water(eta0, H_minus, dx=500.0, g=9.81,
     # 結果の保存
     np.save(os.path.join(save_dir, "eta_history.npy"), eta_history)
 
-    # --- ヒートマップ作成 ---
+    # ヒートマップ作成
     plt.figure(figsize=(9, 7))
     # x軸: km単位
     x_axis = np.arange(nx) * dx / 1000.0
@@ -69,15 +64,17 @@ def run_shallow_water(eta0, H_minus, dx=500.0, g=9.81,
     print(f"Results saved to {save_dir}")
 
 
-if __name__ == "__main__":
-    # パス等は環境に合わせて調整してください
+def main():
     eta0_path = "../../data/wave_height_initial.csv"
     H_path = "../../data/bathemetry.csv"
 
-    # ファイルが存在する場合のみ実行
     try:
         eta0 = np.loadtxt(eta0_path, delimiter=",", skiprows=1, usecols=1)
         H_minus = np.loadtxt(H_path, delimiter=",", skiprows=1, usecols=1)
         run_shallow_water(eta0, H_minus)
     except Exception as e:
         print(f"Error: {e}")
+
+
+if __name__ == "__main__":
+    main()

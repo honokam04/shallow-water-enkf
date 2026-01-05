@@ -17,8 +17,9 @@ def run_shallow_water(eta0, H_minus, dx=500.0, g=9.81,
     nx = len(H)
     u = np.zeros(nx + 1)
 
-    _, _, dt = step_forward(eta, u, H, nx, g, dx, CFL)
-    nt = int(total_time / dt)
+    # 時間刻みdtの計算
+    dt = CFL * dx / np.sqrt(g * np.max(H))
+    nt = int(total_time / dt)  # 時間刻み数
 
     print(f"Simulation Info: dx={dx} m, dt={dt:.3f} s, nt={nt} steps")
 

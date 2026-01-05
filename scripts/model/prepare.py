@@ -1,7 +1,5 @@
 import numpy as np
 
-from shallow_water import step_forward
-
 
 # etaとuを状態ベクトルとしてまとめる
 def pack(eta, u):
@@ -37,21 +35,3 @@ def create_H_matrix(nx, interval, missing_idx=None):
         H[i, idx] = 1
 
     return H, np.array(obs_indices), n_state, n_obs
-
-
-# 真のeta、uの履歴
-def true_history(nx, nt, eta0, H, g, dx, CFL):
-    eta_true_history = np.zeros((nt, nx))
-    u_true_history = np.zeros((nt, nx + 1))
-
-    eta_curr = eta0.copy()
-    u_curr = np.zeros(nx + 1)
-
-    for t_step in range(nt):
-        eta_curr, u_curr = step_forward(eta_curr, u_curr, H, nx, g, dx, CFL)
-
-        # 履歴保存
-        eta_true_history[t_step, :] = eta_curr
-        u_true_history[t_step, :] = u_curr
-
-    print("Truth data generated.")

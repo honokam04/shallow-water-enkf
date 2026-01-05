@@ -40,7 +40,7 @@ def run_shallow_water(eta0, H_minus, dx=500.0, g=9.81,
             break
 
     # 結果の保存
-    np.save(os.path.join(save_dir, "eta_history.npy"), eta_history)
+    np.save(os.path.join(save_dir, "true_history.npy"), eta_history)
 
     # ヒートマップ作成
     plt.figure(figsize=(9, 7))
@@ -60,7 +60,7 @@ def run_shallow_water(eta0, H_minus, dx=500.0, g=9.81,
     plt.title('Space-Time Plot of Tsunami ($\\eta$)')
 
     plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, "eta_heatmap.png"))
+    plt.savefig(os.path.join(save_dir, "true_heatmap.png"))
     print(f"Results saved to {save_dir}")
 
 

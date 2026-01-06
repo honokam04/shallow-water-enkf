@@ -202,7 +202,8 @@ def main():
                           delimiter=",", skiprows=1, usecols=1)
         H_minus = np.loadtxt("../../data/bathemetry.csv",
                              delimiter=",", skiprows=1, usecols=1)
-        run_EnKF(eta0, H_minus, obs_space_interval=100,  # 観測点間隔は60 × 0.5 (km)
+        run_EnKF(eta0, H_minus, obs_space_interval=60,
+                 # 観測点間隔はobs_space_interval × 0.5 (km)
                  obs_time_interval_sec=3.0)
     except Exception as e:
         print(f"Error: {e}")

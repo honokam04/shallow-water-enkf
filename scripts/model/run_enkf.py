@@ -54,13 +54,13 @@ def init_ensemble(nx, dx, N, sigma_init=0.15, correlation_length=20000.0):
     # exp(- (距離^2) / (2 * 特徴的長さ^2))：「周辺20km圏内くらいまで水位誤差は近い」
     B = np.exp(-(dist_matrix**2) / (2 * correlation_length**2))
 
-    # 3. 初期誤差共分散行列（P0^(η)）の生成
+    # 3. 初期誤差共分散行列（C0）の生成
     mean = np.zeros(nx)
-    cov = B * (sigma_init**2)
+    C0 = B * (sigma_init**2)
 
     for m in range(N):
         # 平均0、共分散 B*sigma^2 の多変量正規分布からノイズをサンプリング
-        eta_init_member = np.random.multivariate_normal(mean, cov)
+        eta_init_member = np.random.multivariate_normal(mean, C0)
         # 流速 u: 先行研究に従い初期値は 0
         u_init_member = np.zeros(nx + 1)
 
@@ -130,7 +130,7 @@ def visualize_results(eta_true, eta_analysis,
 # --- メイン実行関数 ---
 def run_EnKF(eta_raw, H_raw, obs_space_interval,  # 空間の観測間隔
              obs_time_interval_sec,  # 時間の観測間隔
-             g=9.81, dx=500.0, total_time=3000.0,
+             N, g=9.81, dx=500.0, total_time=3000.0,
              CFL=0.5, save_dir="../../results"):
 
     if not os.path.exists(save_dir):
@@ -156,7 +156,7 @@ def run_EnKF(eta_raw, H_raw, obs_space_interval,  # 空間の観測間隔
                                         gamma, n_obs, nt)  # 観測 y を生成
 
     # 3. EnKFの実行
-    N = 100  # アンサンブル数
+    N = N  # アンサンブル数
     U = init_ensemble(nx, dx, N)  # 初期アンサンブル
     obs_step_interval = int(obs_time_interval_sec / dt)  # 観測1回の間に何ステップ進むか
     eta_analysis_history = np.zeros((nt, nx))  # データ同化結果を記録
@@ -182,7 +182,7 @@ def run_EnKF(eta_raw, H_raw, obs_space_interval,  # 空間の観測間隔
     # 4. 結果の保存と可視化
     np.save(os.path.join(
         save_dir,
-        f"enkf_history_dx={obs_space_interval}_dt={obs_time_interval_sec}.npy"
+        f"enkf_history_dx={obs_space_interval}_dt={obs_time_interval_sec}_N={N}.npy"
         ),
         eta_analysis_history
         )
@@ -190,7 +190,7 @@ def run_EnKF(eta_raw, H_raw, obs_space_interval,  # 空間の観測間隔
                       obs_indices, dx, dt, nt, nx,
                       os.path.join(
                           save_dir,
-                          f"dx={obs_space_interval}_dt={obs_time_interval_sec}.png"
+                          f"dx={obs_space_interval}_dt={obs_time_interval_sec}_N={N}.png"
                           ))
 
     print(f"Success: Results saved to {save_dir}")
@@ -204,7 +204,7 @@ def main():
                              delimiter=",", skiprows=1, usecols=1)
         run_EnKF(eta0, H_minus, obs_space_interval=60,
                  # 観測点間隔はobs_space_interval × 0.5 (km)
-                 obs_time_interval_sec=3.0)
+                 obs_time_interval_sec=3.0, N=10)
     except Exception as e:
         print(f"Error: {e}")
 

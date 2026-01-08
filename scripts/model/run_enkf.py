@@ -71,36 +71,30 @@ def init_ensemble(nx, dx, N, sigma_init=0.15, correlation_length=20000.0):
 
 # --- 4. 結果の可視化 ---
 def visualize_results(eta_true, eta_analysis,
-                      obs_indices, dx, dt, nt, nx, save_path):
+                      obs_indices, dx, dt, nt, nx, N, save_path):
     x_axis = np.linspace(0, (nx*dx)/1000, nx)
     t_axis = np.linspace(0, nt * dt, nt)
     X_mesh, T_mesh = np.meshgrid(x_axis, t_axis)
 
-    fig, axes = plt.subplots(1, 2, figsize=(16, 7), sharex=True, sharey=True)
+    fig, ax = plt.subplots(1, 1, figsize=(10, 7))
     vmin, vmax = -3.0, 3.0
 
-    # 真値のプロット
-    im1 = axes[0].pcolormesh(X_mesh, T_mesh, eta_true, cmap='jet',
-                             vmin=vmin, vmax=vmax, shading='auto')
-    axes[0].set_title('True State (Reference)')
-    axes[0].set_ylabel('Time (s)')
-    axes[0].set_xlabel('Distance (km)')
-
     # 同化結果のプロット
-    im2 = axes[1].pcolormesh(X_mesh, T_mesh, eta_analysis, cmap='jet',
-                             vmin=vmin, vmax=vmax, shading='auto')
-    axes[1].set_title('EnKF Data Assimilation')
-    axes[1].set_xlabel('Distance (km)')
+    im = ax.pcolormesh(X_mesh, T_mesh, eta_analysis, cmap='jet',
+                       vmin=vmin, vmax=vmax, shading='auto')
+    ax.set_title(f'EnKF Data Assimilation (N={N})')
+    ax.set_ylabel('Time (s)')
+    ax.set_xlabel('Distance (km)')
 
     # 観測地点（白破線）
     for idx in obs_indices:
-        axes[1].axvline(x=idx * dx / 1000, color='white',
-                        alpha=0.3, linestyle='--', linewidth=0.8)
+        ax.axvline(x=idx * dx / 1000, color='white',
+                   alpha=0.3, linestyle='--', linewidth=0.8)
 
-    fig.colorbar(im1, ax=axes.ravel().tolist(),
-                 label='Wave Height (m)', shrink=0.8)
+    fig.colorbar(im, ax=ax, label='Wave Height (m)', shrink=0.8)
     plt.savefig(save_path)
     plt.close()
+
     # RMSEの時系列プロット
     rmse = np.sqrt(np.mean((eta_true - eta_analysis)**2, axis=1))
 
@@ -109,7 +103,7 @@ def visualize_results(eta_true, eta_analysis,
     ax.plot(t_axis, rmse, label='RMSE (Linear)', color='tab:blue')
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('RMSE (m)')
-    ax.set_title('Temporal Evolution of Estimation Error')
+    ax.set_title(f'Temporal Evolution of Estimation Error(N={N})')
     ax.grid(True, alpha=0.3)
     ax.legend(loc='upper left')
 
@@ -187,7 +181,7 @@ def run_EnKF(eta_raw, H_raw, obs_space_interval,  # 空間の観測間隔
         eta_analysis_history
         )
     visualize_results(eta_true, eta_analysis_history,
-                      obs_indices, dx, dt, nt, nx,
+                      obs_indices, dx, dt, nt, nx, N,
                       os.path.join(
                           save_dir,
                           f"dx={obs_space_interval}_dt={obs_time_interval_sec}_N={N}.png"
@@ -204,7 +198,7 @@ def main():
                              delimiter=",", skiprows=1, usecols=1)
         run_EnKF(eta0, H_minus, obs_space_interval=60,
                  # 観測点間隔はobs_space_interval × 0.5 (km)
-                 obs_time_interval_sec=3.0, N=10)
+                 obs_time_interval_sec=3.0, N=50)
     except Exception as e:
         print(f"Error: {e}")
 

@@ -89,7 +89,7 @@ def visualize_results(eta_true, eta_analysis,
     # 観測地点（白破線）
     for idx in obs_indices:
         ax.axvline(x=idx * dx / 1000, color='white',
-                   alpha=0.3, linestyle='--', linewidth=0.8)
+                   alpha=0.8, ls='--', lw=1.5, zorder=5)
 
     fig.colorbar(im, ax=ax, label='Wave Height (m)', shrink=0.8)
     plt.savefig(save_path)
@@ -104,15 +104,16 @@ def visualize_results(eta_true, eta_analysis,
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('RMSE (m)')
     ax.set_title(f'Temporal Evolution of Estimation Error(N={N})')
+    ax.set_ylim(bottom=0)
     ax.grid(True, alpha=0.3)
     ax.legend(loc='upper left')
 
     ax_inset = inset_axes(ax, width="30%", height="30%",
                           loc='upper right', borderpad=2)
 
-    ax_inset.plot(t_axis, rmse, color='tab:red')
-    ax_inset.set_yscale('log')
-    ax_inset.set_title('Log Scale', fontsize=9)
+    ax_inset.loglog(t_axis, rmse, color='tab:red')
+
+    ax_inset.set_title('Log-Log Scale', fontsize=9)
     ax_inset.tick_params(axis='both', which='major', labelsize=8)
     ax_inset.grid(True, which="both", ls="-", alpha=0.2)
 
@@ -125,7 +126,7 @@ def visualize_results(eta_true, eta_analysis,
 def run_EnKF(eta_raw, H_raw, obs_space_interval,  # 空間の観測間隔
              obs_time_interval_sec,  # 時間の観測間隔
              N, g=9.81, dx=500.0, total_time=3000.0,
-             CFL=0.5, save_dir="../../results"):
+             CFL=0.01, save_dir="../../results"):
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -134,6 +135,7 @@ def run_EnKF(eta_raw, H_raw, obs_space_interval,  # 空間の観測間隔
     H = np.abs(H_raw) * 1000.0  # 水深 H を m 単位に
     nx = len(H)  # 格子点数
     dt = CFL * dx / np.sqrt(g * np.max(H))  # CFL条件から時間刻みを計算
+    print(f"dt:{dt}(s)")
     nt = int(total_time / dt)  # 時間刻み数
 
     # 1. 真値データの生成
@@ -198,7 +200,7 @@ def main():
                              delimiter=",", skiprows=1, usecols=1)
         run_EnKF(eta0, H_minus, obs_space_interval=60,
                  # 観測点間隔はobs_space_interval × 0.5 (km)
-                 obs_time_interval_sec=3.0, N=50)
+                 obs_time_interval_sec=3.0, N=2)
     except Exception as e:
         print(f"Error: {e}")
 

@@ -1,6 +1,7 @@
 import numpy as np
 
 
+# 浅水波モデル
 def step_forward(eta, u, H, nx, g, dx, CFL):
     # 関数内で dt を決定（物理的安定性を担保）
     dt = CFL * dx / np.sqrt(g * np.max(H))

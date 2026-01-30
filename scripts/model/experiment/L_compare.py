@@ -48,7 +48,7 @@ def main():
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
         # 最大波高のプロット
-        ax1.plot(Ls/2, max_heights, marker='o', label='Estimated (Analysis)')
+        ax1.plot([L / 2 for L in Ls], max_heights, marker='o', label='Estimated (Analysis)')
         ax1.axhline(y=true_max_h, color='r', linestyle='--',
                     label='True Value'
                     )
@@ -59,7 +59,7 @@ def main():
         ax1.grid(True)
 
         # 到達時刻のプロット
-        ax2.plot(Ls/2, arrival_times, marker='s', color='green',
+        ax2.plot([L / 2 for L in Ls], arrival_times, marker='s', color='green',
                  label='Estimated (Analysis)'
                  )
         ax2.axhline(y=true_arrival_t, color='r', linestyle='--',

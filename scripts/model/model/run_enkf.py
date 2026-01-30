@@ -72,9 +72,9 @@ def run_EnKF(eta_raw, H_raw, obs_space_interval,
     # 4. 結果の保存と可視化
     np.save(os.path.join(
         save_dir,
-        f"enkf_history_dx={obs_space_interval / 2}_CFL={CFL}_N={N}.npy"
+        # f"enkf_history_dx={obs_space_interval / 2}_CFL={CFL}_N={N}.npy"
         # inflationを行う場合
-        # f"enkf_history_dx={obs_space_interval / 2}_CFL={CFL}_N={N}_inf={inflation_factor}.npy"
+        f"enkf_history_dx={obs_space_interval / 2}_CFL={CFL}_N={N}_inf={inflation_factor}.npy"
         ),
         eta_analysis_history
         )
@@ -82,9 +82,9 @@ def run_EnKF(eta_raw, H_raw, obs_space_interval,
                       obs_indices, dx, dt, nt, nx, N,
                       os.path.join(
                           save_dir,
-                          f"dx={obs_space_interval / 2}_CFL={CFL}_N={N}.png"
+                          #f"dx={obs_space_interval / 2}_CFL={CFL}_N={N}.png"
                           # inflationを行う場合
-                          # f"dx={obs_space_interval / 2}_CFL={CFL}_N={N}_inf={inflation_factor}.png"
+                          f"dx={obs_space_interval / 2}_CFL={CFL}_N={N}_inf={inflation_factor}.png"
                           ))
 
     print(f"Success: Results saved to {save_dir}")
@@ -104,7 +104,7 @@ def main():
         run_EnKF(eta0, H_minus, obs_space_interval=60,
                  # 観測点間隔はobs_space_interval × 0.5 (km)
                  obs_time_interval_sec=3.0, N=10, inflation_factor=1.05,
-                 CFL=0.01, save_dir="../../../result/EnKF")
+                 CFL=0.01, save_dir="../../../result/EnKF_inf")
         # inflationを行う場合はsave_dir="../../../result/EnKF_inf"
     except Exception as e:
         print(f"Error: {e}")

@@ -11,6 +11,7 @@ sys.path.append(model_dir)
 from shallow_water import step_forward
 
 
+# 初期波形にノイズを与えた時の応答を調べる実験
 def run_noisy_overlay_animation():
     # パラメータ設定
     g, dx, CFL, total_time = 9.81, 500.0, 0.1, 2500.0

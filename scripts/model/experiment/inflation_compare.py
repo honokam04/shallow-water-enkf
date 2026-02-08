@@ -7,11 +7,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.path.abspath(os.path.join(current_dir, '..', 'model'))
 sys.path.append(model_dir)
 
-from shallow_water import step_forward
-from prepare import pack, unpack, create_H_matrix, get_true_state
-from prepare import create_observations, init_ensemble
-from analysis import analyze_and_compare_tsunami
-from EnKF import analysis_step
 from run_enkf import run_EnKF
 
 

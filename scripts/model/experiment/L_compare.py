@@ -7,11 +7,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.path.abspath(os.path.join(current_dir, '..', 'model'))
 sys.path.append(model_dir)
 
-from shallow_water import step_forward
-from prepare import pack, unpack, create_H_matrix, get_true_state
-from prepare import create_observations, init_ensemble
-from analysis import analyze_and_compare_tsunami
-from EnKF import analysis_step
 from run_enkf import run_EnKF
 
 
@@ -44,35 +39,57 @@ def main():
                 true_max_h = stats_true['max_height']
                 true_arrival_t = stats_true['arrival_time']
 
-        # グラフの作成
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+        # --- (a) 津波到達時刻のプロット ---
+        plt.figure(figsize=(7, 5))
+        # 収束圏の網掛け (±20s)
+        plt.fill_between([0, 105], true_arrival_t - 20, true_arrival_t + 20,
+                         color='gray', alpha=0.1,
+                         label='Convergence Zone (±20s)'
+                         )
 
-        # 最大波高のプロット
-        ax1.plot([L / 2 for L in Ls], max_heights, marker='o', label='Estimated (Analysis)')
-        ax1.axhline(y=true_max_h, color='r', linestyle='--',
-                    label='True Value'
-                    )
-        ax1.set_xlabel('dx')
-        ax1.set_ylabel('Max Wave Height (m)')
-        ax1.set_title('dx vs Max Wave Height')
-        ax1.legend()
-        ax1.grid(True)
-
-        # 到達時刻のプロット
-        ax2.plot([L / 2 for L in Ls], arrival_times, marker='s', color='green',
-                 label='Estimated (Analysis)'
+        # 推定値と真値
+        plt.plot([L / 2 for L in Ls], arrival_times, marker='o', color='#1f77b4',
+                 label='Estimation', zorder=3
                  )
-        ax2.axhline(y=true_arrival_t, color='r', linestyle='--',
-                    label='True Value'
-                    )
-        ax2.set_xlabel('dx')
-        ax2.set_ylabel('Arrival Time (s)')
-        ax2.set_title('dx vs Tsunami Arrival Time')
-        ax2.legend()
-        ax2.grid(True)
+        plt.axhline(y=true_arrival_t, color='r', linestyle='--',
+                    label=f'Numerical Truth ({true_arrival_t:.2f}s)')
+
+        plt.xlabel('Observation spacing (km)')
+        plt.ylabel('Arrival Time (s)')
+        plt.xlim(0, 55)
+        plt.ylim(0, 1200)
+        plt.grid(True, linestyle='--', alpha=0.5)
+        plt.legend(loc='upper right', fontsize='small')
+
+        plt.savefig("../../../result/L_compare/convergence_arrival_time.png", dpi=300)
+        plt.close()
+        print("Saved: convergence_arrival_time.png")
+
+        # --- (b) 最大波高のプロット ---
+        plt.figure(figsize=(7, 5))
+
+        # 収束圏の網掛け (±0.2m)
+        plt.fill_between([0, 105], true_max_h - 0.2, true_max_h + 0.2,
+                         color='gray', alpha=0.1,
+                         label='Convergence Zone (±0.2m)'
+                         )
+
+        # 推定値と真値
+        plt.plot([L / 2 for L in Ls], max_heights, marker='o', color='#1f77b4',
+                 label='Estimation', zorder=3
+                 )
+        plt.axhline(y=true_max_h, color='r', linestyle='--',
+                    label=f'Numerical Truth ({true_max_h:.2f}m)')
+
+        plt.xlabel('Observation spacing (km)')
+        plt.ylabel('Max Height (m)')
+        plt.xlim(0, 55)
+        plt.ylim(0, 4.0)
+        plt.grid(True, linestyle='--', alpha=0.5)
+        plt.legend(loc='upper right', fontsize='small')
 
         plt.tight_layout()
-        plt.savefig("../../../result/L_compare/sensitivity_results.png")
+        plt.savefig("../../../result/L_compare/convergence_max_height.png")
         print("\nSuccess: Sensitivity graphs saved.")
 
     except Exception as e:

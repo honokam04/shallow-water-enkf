@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
-from shallow_water import step_forward
+from shallow_water import step_forward, step_forward_rk4
 
 
 # etaとuを状態ベクトルとしてまとめる
@@ -53,6 +53,26 @@ def get_true_state(eta_raw, H, nx, nt, g, dx, CFL):
     # 1D浅水波モデルによる数値計算
     for t in range(nt):
         e_curr, u_curr, _ = step_forward(e_curr, u_curr, H, nx, g, dx, CFL)
+        # 現在の値を記録
+        eta_true[t, :] = e_curr
+        u_true[t, :] = u_curr
+
+    return eta_true, u_true
+
+
+# 真値の作成
+def get_true_state_rk4(eta_raw, H, nx, nt, g, dx, CFL):
+    # 配列の用意
+    eta_true = np.zeros((nt, nx))
+    u_true = np.zeros((nt, nx + 1))
+
+    # 真値の初期条件
+    e_curr = eta_raw.copy()  # η(x,0)
+    u_curr = np.zeros(nx + 1)  # u(x,0)=0 を指定（まだ動いていないと仮定）
+
+    # 1D浅水波モデルによる数値計算
+    for t in range(nt):
+        e_curr, u_curr, _ = step_forward_rk4(e_curr, u_curr, H, nx, g, dx, CFL)
         # 現在の値を記録
         eta_true[t, :] = e_curr
         u_true[t, :] = u_curr
@@ -135,12 +155,12 @@ def visualize_results(eta_true, eta_analysis,
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('RMSE (m)')
     ax.set_title(f'Temporal Evolution of Estimation Error(N={N})')
-    ax.set_ylim(bottom=0)
+    ax.set_ylim(bottom=0, top=1.0)
     ax.grid(True, alpha=0.3)
     ax.legend(loc='upper left')
 
     ax_inset = inset_axes(ax, width="30%", height="30%",
-                          loc='lower left', borderpad=2)
+                          loc='upper right', borderpad=2)
 
     ax_inset.semilogy(t_axis, rmse, color='tab:red')
 

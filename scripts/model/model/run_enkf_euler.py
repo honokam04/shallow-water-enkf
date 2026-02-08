@@ -82,7 +82,7 @@ def run_EnKF(eta_raw, H_raw, obs_space_interval,
                       obs_indices, dx, dt, nt, nx, N,
                       os.path.join(
                           save_dir,
-                          #f"dx={obs_space_interval / 2}_CFL={CFL}_N={N}.png"
+                          # f"dx={obs_space_interval / 2}_CFL={CFL}_N={N}.png"
                           # inflationを行う場合
                           f"dx={obs_space_interval / 2}_CFL={CFL}_N={N}_inf={inflation_factor}.png"
                           ))
@@ -103,7 +103,7 @@ def main():
                              delimiter=",", skiprows=1, usecols=1)
         run_EnKF(eta0, H_minus, obs_space_interval=60,
                  # 観測点間隔はobs_space_interval × 0.5 (km)
-                 obs_time_interval_sec=3.0, N=10, inflation_factor=1.05,
+                 obs_time_interval_sec=3.0, N=100, inflation_factor=1.05,
                  CFL=0.01, save_dir="../../../result/EnKF_inf")
         # inflationを行う場合はsave_dir="../../../result/EnKF_inf"
     except Exception as e:

@@ -58,7 +58,7 @@ def run_EnKF_real(eta_raw, H_raw, obs_space_interval,
             U[:, m] = pack(eta_m, u_m)
 
         # --- 分析ステップ (Analysis) ---
-        # assimilation_end_time (750秒) 以前、かつ観測タイミングの場合のみ更新を行う
+        # assimilation_end_time 以前、かつ観測タイミングの場合のみ更新を行う
         if t <= assimilation_end_step:
             if t % obs_step_interval == 0:
                 # インフレーションの適用
@@ -67,7 +67,7 @@ def run_EnKF_real(eta_raw, H_raw, obs_space_interval,
                 # 観測データを用いて修正
                 U = analysis_step(U, y_obs_history[t], n_obs, H_mat, Gamma, N)
         else:
-            # 750秒以降は分析ステップをスキップし、純粋な数値シミュレーション(予測)に移行
+            # それ以降は数値シミュレーション(予測)のみ
             pass
 
         # 推定値（アンサンブル平均）の記録
